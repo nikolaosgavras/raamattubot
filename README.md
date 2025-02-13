@@ -1,0 +1,2 @@
+# raamattubot
+discord bot raamatulle
