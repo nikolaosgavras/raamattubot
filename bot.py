@@ -10,9 +10,11 @@ intents = discord.Intents.default()
 intents.message_content = True  # Ensure the bot can read message content
 bot = commands.Bot(command_prefix='!', intents=intents)  # Remove command prefix
 
-# Load the JSON data
-with open('bibleFI/FinPR92.json', 'r', encoding='utf-8') as f:
-    bible_data = json.load(f)
+# Dictionary to map Bible version codes to their respective JSON file paths
+bible_versions = {
+    'R1933': 'bibleFI/FinPR.json',
+    'FB92': 'bibleFI/FinPR92.json'
+}
 
 @bot.event
 async def on_ready():
@@ -39,16 +41,27 @@ async def on_message(message):
                     for j in range(i + 1):
                         potential_book = " ".join(words[j:i + 1])
                         reference = words[i + 1]
-                        print(f'Potential book: {potential_book}, Reference: {reference}')  # Debug log
+                        bible_version = 'R1933'  # Default Bible version
+
+                        # Check if the last word is a Bible version code
+                        if words[-1] in bible_versions:
+                            bible_version = words[-1]
+                            words = words[:-1]  # Remove the version code from the words list
+
+                        print(f'Potential book: {potential_book}, Reference: {reference}, Bible version: {bible_version}')  # Debug log
 
                         chapter_str, verse_range = reference.split(':')
                         chapter = int(chapter_str)
-                        
+
                         # Handle verse ranges (e.g., 5-10)
                         if '-' in verse_range:
                             start_verse, end_verse = map(int, verse_range.split('-'))
                         else:
                             start_verse = end_verse = int(verse_range)
+
+                        # Load the appropriate Bible data
+                        with open(bible_versions[bible_version], 'r', encoding='utf-8') as f:
+                            bible_data = json.load(f)
 
                         # Search through the Bible data case-insensitively
                         found = False
