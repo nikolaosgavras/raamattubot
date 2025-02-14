@@ -13,8 +13,15 @@ bot = commands.Bot(command_prefix='!', intents=intents)  # Remove command prefix
 # Dictionary to map Bible version codes to their respective JSON file paths
 bible_versions = {
     'R1933': 'bibleFI/FinPR.json',
-    'FB92': 'bibleFI/FinPR92.json'
+    'FB92': 'bibleFI/FinPR92.json',
+    'ESV': 'bibleEN/ESV.json'
 }
+
+# List of apocryphal books
+apocryphal_books = [
+    "Tobit", "Judith", "Baruch", "Sirach", "Ecclesiasticus",
+    "1 Maccabees", "2 Maccabees", "Wisdom"
+]
 
 @bot.event
 async def on_ready():
@@ -50,6 +57,11 @@ async def on_message(message):
 
                         print(f'Potential book: {potential_book}, Reference: {reference}, Bible version: {bible_version}')  # Debug log
 
+                        # Check if the book is apocryphal and the version is FB92
+                        if bible_version == 'FB92' and potential_book in apocryphal_books:
+                            await message.reply("Tämä käännös ei tue apokryfikirjoja")
+                            return
+
                         chapter_str, verse_range = reference.split(':')
                         chapter = int(chapter_str)
 
@@ -74,7 +86,7 @@ async def on_message(message):
                                             if start_verse <= v['verse'] <= end_verse:
                                                 verses_text.append(f"**<{v['verse']}>** {v['text']}")
                                         if verses_text:
-                                            await message.reply(f"{b['name']} {chapter}:{start_verse}-{end_verse}\n\n>>> " + " ".join(verses_text))
+                                            await message.reply(f"{b['name']} {chapter}:{start_verse}-{end_verse} ({bible_version})\n\n>>> " + " ".join(verses_text))
                                             found = True
                                         break
                                 if found:
