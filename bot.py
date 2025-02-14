@@ -89,7 +89,10 @@ async def on_message(message):
                                             if start_verse <= v['verse'] <= end_verse:
                                                 verses_text.append(f"**<{v['verse']}>** {v['text']}")
                                         if verses_text:
-                                            await message.reply(f"{b['name']} {chapter}:{start_verse}-{end_verse} ({bible_version})\n\n>>> " + " ".join(verses_text))
+                                            if start_verse == end_verse:
+                                                await message.reply(f"{b['name']} {chapter}:{start_verse} ({bible_version})\n\n>>> " + " ".join(verses_text))
+                                            else:
+                                                await message.reply(f"{b['name']} {chapter}:{start_verse}-{end_verse} ({bible_version})\n\n>>> " + " ".join(verses_text))
                                             found = True
                                         break
                                 if found:
