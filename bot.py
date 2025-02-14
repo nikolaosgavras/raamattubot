@@ -23,6 +23,9 @@ apocryphal_books = [
     "1 Maccabees", "2 Maccabees", "Wisdom"
 ]
 
+# List of Bible versions that do not support deuterocanonical books
+non_deuterocanonical_versions = ['FB92', 'ESV']  # Add more versions as needed
+
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
@@ -57,8 +60,8 @@ async def on_message(message):
 
                         print(f'Potential book: {potential_book}, Reference: {reference}, Bible version: {bible_version}')  # Debug log
 
-                        # Check if the book is apocryphal and the version is FB92
-                        if bible_version == 'FB92' and potential_book in apocryphal_books:
+                        # Check if the book is apocryphal and the version does not support deuterocanonical books
+                        if bible_version in non_deuterocanonical_versions and potential_book in apocryphal_books:
                             await message.reply("Tämä käännös ei tue apokryfikirjoja")
                             return
 
