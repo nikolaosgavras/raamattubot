@@ -67,10 +67,10 @@ async def on_message(message):
                 if chapter_data:
                     verses_text = [f"**<{v}>** {chapter_data[v]}" for v in range(start_verse, end_verse + 1) if v in chapter_data]
                     if verses_text:
-                        if (start_verse == end_verse):
-                            await message.reply(f"{book_name.title()} {chapter}:{start_verse} ({bible_version})\n\n>>> " + " ".join(verses_text))
-                        else:
-                            await message.reply(f"{book_name.title()} {chapter}:{start_verse}-{end_verse} ({bible_version})\n\n>>> " + " ".join(verses_text))
+                        verse_range = f"{start_verse}" if start_verse == end_verse else f"{start_verse}-{end_verse}"
+                        await message.reply(
+                            f"{book_name.title()} {chapter}:{verse_range} ({bible_version})\n\n>>> " + " ".join(verses_text)
+                        )
                         return
         except Exception as e:
             print(f"Error processing message: {e}")
