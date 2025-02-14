@@ -11,7 +11,7 @@ intents.message_content = True  # Ensure the bot can read message content
 bot = commands.Bot(command_prefix='!', intents=intents)  # Remove command prefix
 
 # Load the JSON data
-with open('bibleFI/FinPR.json', 'r', encoding='utf-8') as f:
+with open('bibleFI/FinPR92.json', 'r', encoding='utf-8') as f:
     bible_data = json.load(f)
 
 @bot.event
