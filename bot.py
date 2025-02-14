@@ -46,41 +46,36 @@ async def on_message(message):
     if ':' in message.content:
         try:
             words = message.content.split()
-            for i in range(len(words) - 1):
-                if ':' in words[i + 1]:
-                    for j in range(i + 1):
-                        potential_book = " ".join(words[j:i + 1]).lower()
-                        reference = words[i + 1]
-                        bible_version = 'R1933'
-
-                        if words[-1].lower() in bible_versions:
-                            bible_version = words[-1].upper()
-                            words = words[:-1]
-
-                        if bible_version in non_deuterocanonical_versions and potential_book in apocryphal_books:
-                            await message.reply("Tämä käännös ei tue apokryfikirjoja")
-                            return
-
-                        chapter_str, verse_range = reference.split(':')
-                        chapter = int(chapter_str)
-                        
-                        start_verse, end_verse = (map(int, verse_range.split('-'))
-                                                  if '-' in verse_range else (int(verse_range), int(verse_range)))
-
-                        # Quick lookup using preloaded hashmap
-                        book_data = bible_data_cache[bible_version].get(potential_book)
-                        if book_data:
-                            chapter_data = book_data.get(chapter)
-                            if chapter_data:
-                                verses_text = [f"**<{v}>** {chapter_data[v]}" for v in range(start_verse, end_verse + 1) if v in chapter_data]
-                                if verses_text:
-                                    await message.reply(f"{potential_book.title()} {chapter}:{start_verse}-{end_verse} ({bible_version})\n\n>>> " + " ".join(verses_text))
-                                    return
+            reference = next((w for w in words if ':' in w), None)
+            if reference:
+                book_name = " ".join(words[:words.index(reference)]).lower()
+                bible_version = words[-1].upper() if words[-1].lower() in bible_versions else 'R1933'
+                if bible_version in bible_versions:
+                    words = words[:-1]
+                
+                if bible_version in non_deuterocanonical_versions and book_name in apocryphal_books:
+                    await message.reply("Tämä käännös ei tue apokryfikirjoja")
+                    return
+                
+                chapter_str, verse_range = reference.split(':')
+                chapter = int(chapter_str)
+                start_verse, end_verse = (map(int, verse_range.split('-'))
+                                          if '-' in verse_range else (int(verse_range), int(verse_range)))
+                
+                book_data = bible_data_cache[bible_version].get(book_name)
+                chapter_data = book_data.get(chapter) if book_data else None
+                if chapter_data:
+                    verses_text = [f"**<{v}>** {chapter_data[v]}" for v in range(start_verse, end_verse + 1) if v in chapter_data]
+                    if verses_text:
+                        if (start_verse == end_verse):
+                            await message.reply(f"{book_name.title()} {chapter}:{start_verse} ({bible_version})\n\n>>> " + " ".join(verses_text))
+                        else:
+                            await message.reply(f"{book_name.title()} {chapter}:{start_verse}-{end_verse} ({bible_version})\n\n>>> " + " ".join(verses_text))
+                        return
         except Exception as e:
             print(f"Error processing message: {e}")
 
     await bot.process_commands(message)
-
 TOKEN = os.getenv('DISCORD_TOKEN')
 if TOKEN:
     bot.run(TOKEN)
