@@ -44,8 +44,8 @@ async def on_message(message):
                         bible_version = 'R1933'  # Default Bible version
 
                         # Check if the last word is a Bible version code
-                        if words[-1] in bible_versions:
-                            bible_version = words[-1]
+                        if words[-1].lower() in map(str.lower, bible_versions.keys()):
+                            bible_version = next(key for key in bible_versions if key.lower() == words[-1].lower())
                             words = words[:-1]  # Remove the version code from the words list
 
                         print(f'Potential book: {potential_book}, Reference: {reference}, Bible version: {bible_version}')  # Debug log
